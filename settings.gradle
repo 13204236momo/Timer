@@ -1,2 +1,2 @@
-include ':app', ':commom'
+include ':app', ':commom', ':skin_library'
 rootProject.name='Timer'
