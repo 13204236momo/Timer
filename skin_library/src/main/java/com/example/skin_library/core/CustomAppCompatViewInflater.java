@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatViewInflater;
 
 import com.example.skin_library.views.SkinnableButton;
+import com.example.skin_library.views.SkinnableConstraintLayout;
 import com.example.skin_library.views.SkinnableImageView;
 import com.example.skin_library.views.SkinnableLinearLayout;
 import com.example.skin_library.views.SkinnableRelativeLayout;
@@ -44,6 +45,10 @@ public final class CustomAppCompatViewInflater extends AppCompatViewInflater {
                 break;
             case "RelativeLayout":
                 view = new SkinnableRelativeLayout(context, attrs);
+                this.verifyNotNull(view, name);
+                break;
+            case "ConstraintLayout":
+                view = new SkinnableConstraintLayout(context, attrs);
                 this.verifyNotNull(view, name);
                 break;
             case "TextView":
