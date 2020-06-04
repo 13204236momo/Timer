@@ -1,6 +1,8 @@
 package com.mo.zhou.commom.base;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.mo.zhou.commom.R;
 import com.mo.zhou.commom.density.Density;
+import com.mo.zhou.commom.utils.StatusBarUtil;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -19,12 +22,12 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setStatusBar();
         setContentView(R.layout.activity_base);
         Density.setDensity(getApplication(), this);
+
         initUI();
     }
-
-
 
     private void initUI(){
         llContent = findBy(R.id.ll_content);
@@ -46,6 +49,45 @@ public class BaseActivity extends AppCompatActivity {
                     RelativeLayout.LayoutParams.MATCH_PARENT);
             llContent.addView(contentView, params);
         }
+    }
+
+    private void setStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (isUseFullScreenMode()) {
+                StatusBarUtil.transparencyBar(this);
+            } else {
+                StatusBarUtil.setStatusBarColor(this, getStatusBarColor());
+            }
+
+            if (isUseBlackFontWithStatusBar()) {
+                StatusBarUtil.setLightStatusBar(this, true, isUseFullScreenMode());
+            }
+        }
+    }
+
+    /**
+     * 是否设置成透明状态栏，即就是全屏模式
+     */
+    protected boolean isUseFullScreenMode() {
+        return false;
+    }
+
+    /**
+     * 更改状态栏颜色，只有非全屏模式下有效
+     */
+    protected int getStatusBarColor() {
+        return R.color.state_bar_bg_color;
+    }
+
+    /**
+     * 是否改变状态栏文字颜色为黑色，默认为黑色
+     */
+    protected boolean isUseBlackFontWithStatusBar() {
+        return true;
+    }
+
+    public void jumpActivity(Class<?> clazz) {
+        startActivity(new Intent(this, clazz));
     }
 
 

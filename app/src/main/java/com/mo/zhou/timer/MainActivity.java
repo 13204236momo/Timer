@@ -1,16 +1,15 @@
 package com.mo.zhou.timer;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.flyco.tablayout.CommonTabLayout;
-import com.flyco.tablayout.listener.CustomTabEntity;
-import com.flyco.tablayout.listener.OnTabSelectListener;
 import com.mo.zhou.commom.base.BaseActivity;
+import com.mo.zhou.commom.utils.Helper;
 import com.mo.zhou.timer.note.NotesFragment;
 import com.mo.zhou.timer.widget.TopBar;
 
@@ -28,7 +27,7 @@ public class MainActivity extends BaseActivity {
 
 
     //private String[] mTitles = {"便签", "待办"};
-    private ArrayList<CustomTabEntity> mTabEntities = new ArrayList<>();
+    // private ArrayList<CustomTabEntity> mTabEntities = new ArrayList<>();
     private ArrayList<Fragment> mFragments = new ArrayList<>();
 
     @Override
@@ -36,11 +35,10 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         contentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
         initView();
     }
 
-    private void initView(){
+    private void initView() {
         mFragments.add(new NotesFragment());
         mFragments.add(new NotesFragment());
         vpMain.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
@@ -92,15 +90,25 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        topBar.setOnSelectedListener(new TopBar.OnSelectedListener() {
+        topBar.setOnSelectedListener(new TopBar.OnClickedListener() {
             @Override
-            public void onLeft() {
-                vpMain.setCurrentItem(0);
-            }
-
-            @Override
-            public void onRight() {
-                vpMain.setCurrentItem(1);
+            public void onClick(int state) {
+                switch (state) {
+                    case TopBar.STATE_LEFT:
+                        vpMain.setCurrentItem(0);
+                        break;
+                    case TopBar.STATE_RIGHT:
+                        vpMain.setCurrentItem(1);
+                        break;
+                    case TopBar.STATE_SHOW:
+                        Toast.makeText(MainActivity.this, "show", Toast.LENGTH_SHORT).show();
+                        Helper.showToast("Toast.makeText(MainActivity.this, \"show\", Toast.LENGTH_SHORT).shoToast.makeText(MainActivity.this, \"show\", Toast.LENGTH_SHORT).show();");
+                        break;
+                    case TopBar.STATE_HIDE:
+                        //Toast.makeText(MainActivity.this, "hide",Toast.LENGTH_LONG).show();
+                        Helper.showToast("Toast.makxweText(MainActivity.this, \"show\", Toast.LENGTH_SHORT).show();");
+                        break;
+                }
             }
         });
 
