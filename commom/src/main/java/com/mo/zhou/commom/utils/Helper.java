@@ -1,19 +1,28 @@
 package com.mo.zhou.commom.utils;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.media.Image;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 
 public class Helper {
-    public static Context mContext;
+    public static Application mContext;
     private static Toast mToast;
 
     /**
@@ -30,9 +39,11 @@ public class Helper {
         if (TextUtils.isEmpty(str)) return;
         if (mToast == null) {
             mToast = Toast.makeText(mContext, str, Toast.LENGTH_SHORT);
-
+            LinearLayout ll= (LinearLayout) mToast.getView();
+            TextView tv = (TextView) ll.getChildAt(0);
+            tv.setTextSize(18);
         } else {
-            mToast.setText(str);
+            mToast.setText("时间管理大师:"+str);
         }
         mToast.show();
     }
@@ -46,23 +57,6 @@ public class Helper {
     public static boolean isMainThread(String aThreadName) {
         return aThreadName.equals("main");
     }
-
-//    public static void showToast(Context context,String str) {
-//        //自定义Toast控件
-//        View toastView = LayoutInflater.from(context).inflate(R.layout.toast_clear_layout, null);
-//        LinearLayout relativeLayout = (LinearLayout) toastView.findViewById(R.id.toast_linear);
-//        //动态设置toast控件的宽高度，宽高分别是130dp
-//        //这里用了一个将dp转换为px的工具类PxUtil
-//        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dip2px(900), ViewGroup.LayoutParams.WRAP_CONTENT);
-//        relativeLayout.setLayoutParams(layoutParams);
-//        TextView textView = toastView.findViewById(R.id.tv_toast_clear);
-//        textView.setText(str);
-//        Toast toast = new Toast(context);
-//        toast.setDuration(Toast.LENGTH_SHORT);
-//        toast.setGravity(Gravity.BOTTOM, 0, 200);
-//        toast.setView(toastView);
-//        toast.show();
-//    }
 
 
     /**
@@ -128,6 +122,36 @@ public class Helper {
     public static int px2dip(float pxValue) {
         if (mContext == null) return 0;
         return px2dip(mContext, pxValue);
+    }
+
+
+    public static int getScreenWidth() {
+        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        return display.getWidth();
+    }
+
+    public static int getScreenHeight() {
+        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        return display.getHeight();
+    }
+
+    public static void showKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) view.getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            view.requestFocus();
+            imm.showSoftInput(view, 0);
+        }
+    }
+
+    public static void hideKeyboard(View view){
+        InputMethodManager imm = (InputMethodManager) view.getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+        }
     }
 
 

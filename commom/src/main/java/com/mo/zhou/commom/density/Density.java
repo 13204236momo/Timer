@@ -11,7 +11,7 @@ public class Density {
      * 参考像素密度，即UI设计图尺寸
      * 由此，使用后 1dp = 1px
      */
-    private static final float WIDTH = 1080;
+    private static final float WIDTH = 420;
     private static float appDensity;
     private static float appScaleDensity;
 

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="15dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp">
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="6月6日  傍晚6:26"/>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="1dp"
+        android:layout_height="12dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@id/tv_time"
+        android:background="@color/default_text"/>
+
+    <TextView
+        android:id="@+id/tv_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@id/view"
+        android:text="0字" />
+    <ScrollView
+        android:id="@+id/sl_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/tv_time"
+        android:layout_above="@id/edit_bar">
+
+        <TextView
+            android:id="@+id/et_content"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:hint="开始你的记吧..."
+            android:textSize="18sp"
+            android:background="@android:color/transparent" />
+    </ScrollView>
+
+
+
+    <com.mo.zhou.timer.widget.EditBar
+        android:id="@+id/edit_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>

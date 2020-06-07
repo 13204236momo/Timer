@@ -1,8 +1,13 @@
 package com.mo.zhou.timer;
 
+import android.animation.ValueAnimator;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -10,8 +15,13 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.mo.zhou.commom.base.BaseActivity;
 import com.mo.zhou.commom.utils.Helper;
+import com.mo.zhou.timer.event.AnimationEvent;
 import com.mo.zhou.timer.note.NotesFragment;
 import com.mo.zhou.timer.widget.TopBar;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
@@ -25,9 +35,6 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.vp_main)
     ViewPager vpMain;
 
-
-    //private String[] mTitles = {"便签", "待办"};
-    // private ArrayList<CustomTabEntity> mTabEntities = new ArrayList<>();
     private ArrayList<Fragment> mFragments = new ArrayList<>();
 
     @Override
@@ -43,30 +50,6 @@ public class MainActivity extends BaseActivity {
         mFragments.add(new NotesFragment());
         vpMain.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
         vpMain.setCurrentItem(0);
-
-//        if (mTabEntities.size() == 0) {
-//            for (int i = 0; i < mTitles.length; i++) {
-//                final int finalI = i;
-//                mTabEntities.add(new CustomTabEntity() {
-//                    @Override
-//                    public String getTabTitle() {
-//                        return mTitles[finalI];
-//                    }
-//
-//                    @Override
-//                    public int getTabSelectedIcon() {
-//                        return 0;
-//                    }
-//
-//                    @Override
-//                    public int getTabUnselectedIcon() {
-//                        return 0;
-//                    }
-//                });
-//            }
-//        }
-//
-//        tlMain.setTabData(mTabEntities);
 
         initEvent();
 
@@ -101,30 +84,69 @@ public class MainActivity extends BaseActivity {
                         vpMain.setCurrentItem(1);
                         break;
                     case TopBar.STATE_SHOW:
-                        Toast.makeText(MainActivity.this, "show", Toast.LENGTH_SHORT).show();
-                        Helper.showToast("Toast.makeText(MainActivity.this, \"show\", Toast.LENGTH_SHORT).shoToast.makeText(MainActivity.this, \"show\", Toast.LENGTH_SHORT).show();");
+                        //Toast.makeText(MainActivity.this, "show", Toast.LENGTH_SHORT).show();
+                        Helper.showToast("show");
                         break;
                     case TopBar.STATE_HIDE:
                         //Toast.makeText(MainActivity.this, "hide",Toast.LENGTH_LONG).show();
-                        Helper.showToast("Toast.makxweText(MainActivity.this, \"show\", Toast.LENGTH_SHORT).show();");
+                        Helper.showToast("hide");
                         break;
                 }
             }
         });
 
+    }
 
-//        tlMain.setOnTabSelectListener(new OnTabSelectListener() {
-//            @Override
-//            public void onTabSelect(int position) {
-//                vpMain.setCurrentItem(position);
-//            }
-//
-//            @Override
-//            public void onTabReselect(int position) {
-//
-//            }
-//        });
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void animation(AnimationEvent data) {
+        switch (data.state) {
+            case AnimationEvent.STATE_SHOW:
+                showAnimation();
+                break;
+            case AnimationEvent.STATE_HIDE:
+                hideAnimation();
+                break;
+        }
+    }
+
+    private void showAnimation(){
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(topBar.getHeight(), 0).setDuration(200);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) vpMain.getLayoutParams();
+                layoutParams.setMargins(0,(int) animation.getAnimatedValue(),0,0);
+            }
+        });
+
+        valueAnimator.start();
+    }
+
+    private void hideAnimation(){
+
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(0,topBar.getHeight()).setDuration(200);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) vpMain.getLayoutParams();
+                layoutParams.setMargins(0,(int) animation.getAnimatedValue(),0,0);
+            }
+        });
+
+        valueAnimator.start();
     }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {

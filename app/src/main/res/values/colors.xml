@@ -2,11 +2,15 @@
 <resources>
     <color name="colorPrimary">#ffffff</color>
     <color name="colorPrimaryDark">#ffffff</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#4496F8</color>
 
     <color name="state_bar_text_color">#000000</color>
 
     <color name="main_top_bar_text_selected">@android:color/holo_green_light</color>
     <color name="main_top_bar_text_unSelected">@android:color/black</color>
+    <color name="search_view_bg">#E8E9E8</color>
+    <color name="default_text">#888888</color>
+    <color name="white">#ffffff</color>
+
 
 </resources>

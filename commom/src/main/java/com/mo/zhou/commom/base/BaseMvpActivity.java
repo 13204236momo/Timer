@@ -15,15 +15,28 @@ public abstract class BaseMvpActivity<T extends BasePresenter, E extends BaseMod
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // getSupportActionBar().hide();
+        // getSupportActionBar().hide();
         init();
     }
 
     protected void init() {
+        contentView(getLayoutResID());
         mPresenter = TUtil.getT(this, 0);
         mModel = TUtil.getT(this, 1);
         if (this instanceof BaseView) mPresenter.setVM(this, mModel);
+        initView();
+
     }
+
+    /**
+     * 获得Layout文件id
+     *
+     * @return
+     */
+    protected abstract int getLayoutResID();
+
+
+    protected abstract void initView();
 
 }
 

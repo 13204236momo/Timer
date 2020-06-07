@@ -21,6 +21,7 @@ public class TopBar extends LinearLayout {
     private TextView tvLeft;
     private TextView tvRight;
     private ImageView ivSpread;
+    private ImageView ivSet;
     private OnClickedListener listener;
 
     private boolean isSelectedLeft = true;
@@ -47,6 +48,7 @@ public class TopBar extends LinearLayout {
         tvLeft = findViewById(R.id.tv_left);
         tvRight = findViewById(R.id.tv_right);
         ivSpread = findViewById(R.id.iv_spread);
+        ivSet = findViewById(R.id.iv_setting);
     }
 
     private void initEvent() {
@@ -94,6 +96,13 @@ public class TopBar extends LinearLayout {
                         isSelectedLeft = false;
                     }
                 }
+            }
+        });
+
+        ivSet.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }
