@@ -36,18 +36,18 @@
         android:layout_below="@id/tv_time"
         android:layout_above="@id/edit_bar">
 
-        <TextView
+        <com.mo.zhou.timer.widget.MoreResourceEditText
             android:id="@+id/et_content"
             android:layout_width="match_parent"
-            android:layout_height="500dp"
-            android:hint="开始你的记吧..."
+            android:layout_height="match_parent"
+            android:hint="开始你的记录吧..."
             android:textSize="18sp"
             android:background="@android:color/transparent" />
     </ScrollView>
 
 
 
-    <com.mo.zhou.timer.widget.EditBar
+    <com.mo.zhou.timer.widget.EditBottomBar
         android:id="@+id/edit_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

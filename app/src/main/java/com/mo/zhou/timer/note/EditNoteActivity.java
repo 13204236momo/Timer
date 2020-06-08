@@ -1,20 +1,15 @@
 package com.mo.zhou.timer.note;
 
-import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.mo.zhou.commom.base.BaseMvpActivity;
 import com.mo.zhou.commom.utils.Helper;
-import com.mo.zhou.commom.utils.SoftKeyBoardListener;
 import com.mo.zhou.timer.R;
-import com.mo.zhou.timer.widget.EditBar;
+import com.mo.zhou.timer.widget.EditBottomBar;
 import com.mo.zhou.timer.widget.MoreResourceEditText;
 
 import butterknife.BindView;
@@ -33,7 +28,7 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
     @BindView(R.id.sl_content)
     ScrollView slContent;
     @BindView(R.id.edit_bar)
-    EditBar editBar;
+    EditBottomBar editBar;
 
     private int editTextHeight;
 
@@ -88,19 +83,38 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
             }
         });
 
-        editBar.setEdirBarClickListener(new EditBar.OnEditBarClickListener() {
+        slContent.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                //通知父控件请勿拦截本控件touch事件
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_UP:
+                        //点击整个页面都会让内容框获得焦点，且弹出软键盘
+                        etContent.setFocusable(true);
+                        etContent.setFocusableInTouchMode(true);
+                        etContent.requestFocus();
+                        //AddFlagActivity.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                        Helper.showKeyboard(etContent);
+                        break;
+                }
+                return false;
+            }
+        });
+
+        editBar.setEdirBarClickListener(new EditBottomBar.OnEditBarClickListener() {
             @Override
             public void onClick(int index) {
                 switch (index) {
-                    case EditBar.INDEX_PIC:
+                    case EditBottomBar.INDEX_PIC:
                         break;
-                    case EditBar.INDEX_CHECK:
+                    case EditBottomBar.INDEX_CHECK:
                         break;
-                    case EditBar.INDEX_THEME:
+                    case EditBottomBar.INDEX_THEME:
                         break;
-                    case EditBar.INDEX_STYLE:
+                    case EditBottomBar.INDEX_STYLE:
                         break;
-                    case EditBar.INDEX_AUDIO:
+                    case EditBottomBar.INDEX_AUDIO:
                         break;
                 }
             }

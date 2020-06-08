@@ -8,10 +8,9 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
-import com.mo.zhou.commom.utils.Helper;
 import com.mo.zhou.timer.R;
 
-public class EditBar extends LinearLayout {
+public class EditBottomBar extends LinearLayout {
 
     public static final int INDEX_PIC = 0;
     public static final int INDEX_CHECK = 1;
@@ -23,15 +22,15 @@ public class EditBar extends LinearLayout {
     private ImageView ivPic, ivCheck, ivTheme, ivStyle, ivAudio;
     private OnEditBarClickListener listener;
 
-    public EditBar(Context context) {
+    public EditBottomBar(Context context) {
         this(context, null);
     }
 
-    public EditBar(Context context, @Nullable AttributeSet attrs) {
+    public EditBottomBar(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public EditBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public EditBottomBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
