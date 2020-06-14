@@ -1,5 +1,9 @@
 package com.mo.zhou.timer.note;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -8,9 +12,15 @@ import android.widget.TextView;
 
 import com.mo.zhou.commom.base.BaseMvpActivity;
 import com.mo.zhou.commom.utils.Helper;
+import com.mo.zhou.commom.utils.SoftKeyBoardListener;
 import com.mo.zhou.timer.R;
+import com.mo.zhou.timer.entity.EditHistoryEntity;
 import com.mo.zhou.timer.widget.EditBottomBar;
+import com.mo.zhou.timer.widget.EditTopBar;
 import com.mo.zhou.timer.widget.MoreResourceEditText;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,8 +39,18 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
     ScrollView slContent;
     @BindView(R.id.edit_bar)
     EditBottomBar editBar;
+    @BindView(R.id.top_bar_edit)
+    EditTopBar editTopBar;
 
     private int editTextHeight;
+    //编辑历史
+    private List<EditHistoryEntity> editHistory = new ArrayList<>();
+
+    private int currentIndex = -1;
+
+
+    private TextWatcher textWatcher;
+    String buffer;
 
     @Override
     protected int getLayoutResID() {
@@ -40,33 +60,29 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
     @Override
     protected void initView() {
         ButterKnife.bind(this);
-
-        etContent.setEnabled(true);
-        etContent.setFocusable(true);//可以通过键盘得到焦点
-        etContent.setFocusableInTouchMode(true);//可以通过触摸得到焦点
         initEvent();
+        editHistory.add(new EditHistoryEntity(0, "", 0, EditHistoryEntity.TYPE_ADD));
     }
 
     private void initEvent() {
-//        SoftKeyBoardListener.setListener(this, new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
-//            @Override
-//            public void keyBoardShow(int height) {
-//                editTextHeight = height;
-//                RelativeLayout.LayoutParams layoutParams1 = (RelativeLayout.LayoutParams) slContent.getLayoutParams();
-//                layoutParams1.height = height + Helper.dip2px(50);
-//                slContent.setLayoutParams(layoutParams1);
-//                Helper.showToast(height + "");
-//
-//            }
-//
-//            @Override
-//            public void keyBoardHide(int height) {
-//                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) slContent.getLayoutParams();
-//                layoutParams.height = Helper.getScreenHeight();
-//                slContent.setLayoutParams(layoutParams);
-//
-//            }
-//        });
+        SoftKeyBoardListener.setListener(this, new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
+            @Override
+            public void keyBoardShow(int height) {
+                editTopBar.showEdit();
+                setColor();
+            }
+
+            @Override
+            public void keyBoardHide(int height) {
+                editTopBar.showSet();
+                etContent.setFocusable(false);
+                editHistory.clear();
+                editHistory.add(new EditHistoryEntity(0, "", 0, EditHistoryEntity.TYPE_ADD));
+                currentIndex = -1;
+                setColor();
+                editTopBar.setSaveVisible(View.GONE);
+            }
+        });
 
 
         etContent.setOnTouchListener(new View.OnTouchListener() {
@@ -83,24 +99,27 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
             }
         });
 
-        slContent.setOnTouchListener(new View.OnTouchListener() {
+
+        textWatcher = new TextWatcher() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                //通知父控件请勿拦截本控件touch事件
-                v.getParent().requestDisallowInterceptTouchEvent(true);
-                switch (event.getAction()){
-                    case MotionEvent.ACTION_UP:
-                        //点击整个页面都会让内容框获得焦点，且弹出软键盘
-                        etContent.setFocusable(true);
-                        etContent.setFocusableInTouchMode(true);
-                        etContent.requestFocus();
-                        //AddFlagActivity.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                        Helper.showKeyboard(etContent);
-                        break;
-                }
-                return false;
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
             }
-        });
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                editHistory.add(new EditHistoryEntity(editHistory.size(), s.subSequence(start, start + count), start, EditHistoryEntity.TYPE_ADD));
+                currentIndex = editHistory.size() - 1;
+                setColor();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        };
+        etContent.addTextChangedListener(textWatcher);
+
 
         editBar.setEdirBarClickListener(new EditBottomBar.OnEditBarClickListener() {
             @Override
@@ -115,6 +134,75 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
                     case EditBottomBar.INDEX_STYLE:
                         break;
                     case EditBottomBar.INDEX_AUDIO:
+                        break;
+                }
+            }
+        });
+
+        slContent.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                etContent.setFocusableInTouchMode(true);//可以通过触摸得到焦点
+                etContent.setEnabled(true);
+                etContent.setFocusable(true);//可以通过键盘得到焦点
+                Helper.showKeyboard(etContent);
+                return false;
+            }
+        });
+
+        editTopBar.setOnEditTopBarClickedListener(new EditTopBar.OnEditTopBarClickedListener() {
+            @Override
+            public void onClick(int state) {
+                switch (state) {
+                    case EditTopBar.INDEX_BACK:
+                        finish();
+                        break;
+                    case EditTopBar.INDEX_BACKWARD:
+                        if (currentIndex >= 1) {
+                            etContent.removeTextChangedListener(textWatcher);
+                            EditHistoryEntity entity = editHistory.get(currentIndex);
+                            if (entity.getType() == EditHistoryEntity.TYPE_ADD) {
+                                etContent.getText().delete(entity.getCharIndex(), entity.getCharIndex() + entity.getContent().length());
+                                etContent.setSelection(entity.getCharIndex());
+                            } else if (entity.getType() == EditHistoryEntity.TYPE_DELETE) {
+                                etContent.getText().insert(entity.getCharIndex(), entity.getContent());
+                                etContent.setSelection(entity.getCharIndex() + 1);
+                            }
+                            etContent.addTextChangedListener(textWatcher);
+                            currentIndex--;
+
+                        } else {
+
+                        }
+                        setColor();
+
+                        break;
+                    case EditTopBar.INDEX_FORWARD:
+                        if (currentIndex < editHistory.size() - 1) {
+                            currentIndex++;
+                            etContent.removeTextChangedListener(textWatcher);
+                            EditHistoryEntity entity = editHistory.get(currentIndex);
+                            if (entity.getType() == EditHistoryEntity.TYPE_ADD) {
+                                etContent.getText().insert(entity.getCharIndex(), entity.getContent());
+                                etContent.setSelection(entity.getCharIndex() + entity.getContent().length());
+                            } else if (entity.getType() == EditHistoryEntity.TYPE_DELETE) {
+                                etContent.getText().delete(entity.getCharIndex(), entity.getCharIndex() + entity.getContent().length());
+                                etContent.setSelection(entity.getCharIndex() + entity.getContent().length()-1);
+                            }
+
+                            etContent.addTextChangedListener(textWatcher);
+                        } else {
+                        }
+                        setColor();
+
+                        break;
+                    case EditTopBar.INDEX_SAVE:
+                        break;
+                    case EditTopBar.INDEX_SHARE:
+                        break;
+                    case EditTopBar.INDEX_THEME:
+                        break;
+                    default:
                         break;
                 }
             }
@@ -146,6 +234,46 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
     void onClick(View v) {
         switch (v.getId()) {
 
+        }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        etContent.removeTextChangedListener(textWatcher);
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+            //光标位置
+            int position = etContent.getSelectionStart();
+            CharSequence content = etContent.getText();
+            editHistory.add(new EditHistoryEntity(editHistory.size(), String.valueOf(content.charAt(position - 1)), position - 1, EditHistoryEntity.TYPE_DELETE));
+            currentIndex = editHistory.size() - 1;
+        } else if (event.getAction() == KeyEvent.ACTION_UP && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+            etContent.addTextChangedListener(textWatcher);
+            setColor();
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+
+    private void setColor() {
+        if (currentIndex == -1) {
+            editTopBar.setForwardTint(R.color.default_gray);
+            editTopBar.setBackwardTint(R.color.default_gray);
+        } else if (currentIndex == 0) {
+            editTopBar.setForwardTint(R.color.colorPrimary);
+            editTopBar.setBackwardTint(R.color.default_gray);
+        } else if (currentIndex == editHistory.size() - 1) {
+            editTopBar.setForwardTint(R.color.default_gray);
+            editTopBar.setBackwardTint(R.color.colorPrimary);
+        } else {
+            editTopBar.setForwardTint(R.color.colorPrimary);
+            editTopBar.setBackwardTint(R.color.colorPrimary);
+        }
+
+        //Log.e("zhou",etContent.getText());
+        if (etContent.getText().toString().equals("")) {
+            editTopBar.setSaveVisible(View.GONE);
+        } else {
+            editTopBar.setSaveVisible(View.VISIBLE);
         }
     }
 }

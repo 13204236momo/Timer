@@ -4,6 +4,8 @@ import com.mo.zhou.commom.base.mvp.BaseModel;
 import com.mo.zhou.commom.base.mvp.BasePresenter;
 import com.mo.zhou.commom.base.mvp.BaseView;
 
+import java.util.List;
+
 public class EditNoteContract {
 
     interface View extends BaseView {
@@ -20,6 +22,8 @@ public class EditNoteContract {
         public void onStart() {
 
         }
+
+        //public abstract void showState(List<String> notes);
         
     }
 }
