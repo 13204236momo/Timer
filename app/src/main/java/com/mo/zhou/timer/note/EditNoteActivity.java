@@ -2,7 +2,6 @@ package com.mo.zhou.timer.note;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -11,6 +10,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.mo.zhou.commom.base.BaseMvpActivity;
+import com.mo.zhou.commom.utils.DateUtils;
 import com.mo.zhou.commom.utils.Helper;
 import com.mo.zhou.commom.utils.SoftKeyBoardListener;
 import com.mo.zhou.timer.R;
@@ -42,15 +42,15 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
     @BindView(R.id.top_bar_edit)
     EditTopBar editTopBar;
 
-    private int editTextHeight;
+
+    //创建时间
+    private long createTime = 0l;
     //编辑历史
     private List<EditHistoryEntity> editHistory = new ArrayList<>();
-
     private int currentIndex = -1;
-
-
     private TextWatcher textWatcher;
-    String buffer;
+    private int editTextHeight;
+
 
     @Override
     protected int getLayoutResID() {
@@ -62,12 +62,15 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
         ButterKnife.bind(this);
         initEvent();
         editHistory.add(new EditHistoryEntity(0, "", 0, EditHistoryEntity.TYPE_ADD));
+        createTime = System.currentTimeMillis();
+        tvTime.setText(DateUtils.convertToString(createTime,DateUtils.FORMAT_MMCDD_HH_MM));
     }
 
     private void initEvent() {
         SoftKeyBoardListener.setListener(this, new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
             @Override
             public void keyBoardShow(int height) {
+                editTextHeight = height;
                 editTopBar.showEdit();
                 setColor();
             }
@@ -88,13 +91,9 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
         etContent.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
-                //触摸的是EditText并且当前EditText可以滚动则将事件交给EditText处理；否则将事件交由其父类处理
-                if ((view.getId() == R.id.et_content && canVerticalScroll(etContent))) {
-                    view.getParent().requestDisallowInterceptTouchEvent(true);//告诉父view，我的事件自己处理
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        view.getParent().requestDisallowInterceptTouchEvent(false);//告诉父view，你可以处理了
-                    }
-                }
+                etContent.setFocusableInTouchMode(true);//可以通过触摸得到焦点
+                etContent.setEnabled(true);
+                etContent.setFocusable(true);
                 return false;
             }
         });
@@ -142,10 +141,12 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
         slContent.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                etContent.setFocusableInTouchMode(true);//可以通过触摸得到焦点
-                etContent.setEnabled(true);
-                etContent.setFocusable(true);//可以通过键盘得到焦点
-                Helper.showKeyboard(etContent);
+                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                    etContent.setFocusableInTouchMode(true);//可以通过触摸得到焦点
+                    etContent.setEnabled(true);
+                    etContent.setFocusable(true);//可以通过键盘得到焦点
+                    Helper.showKeyboard(etContent);
+                }
                 return false;
             }
         });
@@ -269,11 +270,11 @@ public class EditNoteActivity extends BaseMvpActivity<EditNotePresenter, EditNot
             editTopBar.setBackwardTint(R.color.colorPrimary);
         }
 
-        //Log.e("zhou",etContent.getText());
         if (etContent.getText().toString().equals("")) {
             editTopBar.setSaveVisible(View.GONE);
         } else {
             editTopBar.setSaveVisible(View.VISIBLE);
         }
+        tvCount.setText(etContent.getText().length()+"字");
     }
 }
